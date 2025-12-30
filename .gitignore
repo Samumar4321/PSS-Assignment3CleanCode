@@ -1,0 +1,7 @@
+/latex/_minted
+*.aux
+*.fdb_latexmk
+*.fls
+*.log
+*.gz
+*.toc
