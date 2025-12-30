@@ -12,7 +12,7 @@
     Per iniziare il nome non riflette il compito che la funzione svolge, \textit{jsonParse()} suggerisce che la funzione analizzi del codice JSON, possibilmente estraendo delle informazioni,
     ma al contrario la funzione eegue molte altre operazioni non inerenti all'analisi del JSON, un nome migliore potrebbe essere \textit{getEventsFromAPI()}
     
-    Come anticipato, la funzione viola il \textbf{SRP (Single Responsibility Principle)}, si occupa infatti di:
+    Come anticipato, la funzione viola il \textbf{SRP (Single Responsibility Principle)} e il \textbf{CQS (Command Query Separation)}, si occupa infatti di:
     \begin{itemize}
         \item creare l'URL della API da chiamare;
         \item scrivere sul Log informazioni di debug;
@@ -22,7 +22,7 @@
         \item gestire la logica di eventuali errori di connessione o risposta;
     \end{itemize}
 
-    Inoltre la funzione utilizza stringhe \textit{embedded} per gestire la richiesta,creazione e parsing delle risposte, che rendono modifiche futura più laboriose e complesse;
+    Inoltre la funzione utilizza stringhe \textit{embedded} per gestire la richiesta, creazione e parsing delle risposte, che rendono modifiche futura più laboriose e complesse;
     sarebbe opportuno usare variabili globali o costanti.
     
     Elevato annidamento delle funzioni, dovuto alla gestione degli errori e parsing del JSON eseguita con lambda functions, che complicano esponenzialmente la leggibilità del codice,
