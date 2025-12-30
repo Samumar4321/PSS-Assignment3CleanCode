@@ -1,0 +1,40 @@
+\documentclass{article}
+\usepackage[paper=a4paper,margin=1in]{geometry}
+
+\usepackage[utf8]{inputenc}
+
+\usepackage{subfiles}
+
+\usepackage{minted}
+\setminted{	
+	numbersep=5pt,             % distanza numeri-codice
+	frame=single,              % cornice
+	breaklines=true,           % a capo automatico
+	bgcolor=bggray	           % sfondo
+}
+
+\usepackage{xcolor}
+\definecolor{bggray}{rgb}{0.97,0.97,0.97} % colore sfondo
+
+\begin{document}
+
+
+\begin{titlepage}
+    \centering
+    {\scshape\LARGE Gruppo 31\par}
+    \vspace{1cm}
+    {\scshape\Large PSS\par}
+    \vspace{1.5cm}
+    {\huge\bfseries Assignment 3 - Clean Code\par}
+    \vspace{2cm}   
+\end{titlepage}
+
+
+\tableofcontents
+\newpage
+
+\section{Applicazzione scelta}
+\newpage
+\subfile{capitoli/JsonParser.tex}
+
+\end{document}

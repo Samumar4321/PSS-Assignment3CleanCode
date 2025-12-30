@@ -1,0 +1,40 @@
+\section{Classe JsonParser.java}
+    \subsection{Ruolo}
+
+    \subsection{Codice originale}
+    \inputminted[linenos, frame=lines]{java}{../old/JsonParser.java}
+
+    \subsection{Analisi di Clean Code}
+    La classe presenta diversi problemi di Clean Code, analizziamo quindi il codice presente al suo interno.
+
+    La funzione \textbf{jsonParse} risulta troppo massiccia e complessa, rendendo difficile capire a primo impatto cosa faccia e presentando diversi aspetti su cui poter agire.
+
+    Per iniziare il nome non riflette il compito che la funzione svolge, \textit{jsonParse()} suggerisce che la funzione analizzi del codice JSON, possibilmente estraendo delle informazioni,
+    ma al contrario la funzione eegue molte altre operazioni non inerenti all'analisi del JSON, un nome migliore potrebbe essere \textit{getEventsFromAPI()}
+    
+    Come anticipato, la funzione viola il \textbf{SRP (Single Responsibility Principle)}, si occupa infatti di:
+    \begin{itemize}
+        \item creare l'URL della API da chiamare;
+        \item scrivere sul Log informazioni di debug;
+        \item gestire la connessione HTTP verso la API;
+        \item effettuare la chiamata alla API di TicketMaster;
+        \item gestire la logica di parsing della risposta JSON;
+        \item gestire la logica di eventuali errori di connessione o risposta;
+    \end{itemize}
+
+    Inoltre la funzione utilizza stringhe \textit{embedded} per gestire la richiesta,creazione e parsing delle risposte, che rendono modifiche futura più laboriose e complesse;
+    sarebbe opportuno usare variabili globali o costanti.
+    
+    Elevato annidamento delle funzioni, dovuto alla gestione degli errori e parsing del JSON eseguita con lambda functions, che complicano esponenzialmente la leggibilità del codice,
+    risolvibile estraendo i vari compiti in funzioni singole e separate.
+    
+    La riga 84 presenta inoltre un grosso problema di integrità e sicurezza, gli eventi vengono infatti modificati direttamente sulla variabile originale, senza passare per una variabile
+    locale intermedia, questò rischia di introdurre difficioltà di debug e problemi di concorrenza.
+    La riga 26 presenta anch'essa un problema simile, il valore della API key non dovrebbe essere hardcoded in chiaro nella classe.
+
+    I nomi di variabili e funzioni sono perlopiù significativi e coerenti con il contesto di utilizzo, con alcune eccezzioni quali: \textit{Log.d} e \textit{Log.e} che potrebbero risultare poco chiari.
+
+    Dal punto di vista dei commenti, la funzione presenta un commento generale che spiega lo scopo della funzione in maniera molto ambigua e generica, all'interno vi sono diversi commenti per delimitare e
+    specificare le funzioni di ogni blocco di codice, ciò risulta ridondante e superfluo ma necessario data la complessità della funzione.
+
+    \subsection{Code Refactoring}

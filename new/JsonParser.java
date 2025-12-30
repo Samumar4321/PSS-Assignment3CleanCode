@@ -52,18 +52,22 @@ public class JsonParser {
         this.onEventsParsedListener = listener;
     }
 
+    private String buildURL(){
+        StringBuilder urlBuilder = new StringBuilder("https://app.ticketmaster.com/").append(root).append("?");
+        for (String queryParam : queryParams) {
+            urlBuilder.append(queryParam).append("&");
+        }
+        return urlBuilder.append(API_KEY).toString();
+    }
+    
     /**
      * Creates a JsonObjectRequest for the API call.
      *
      * @return JsonObjectRequest for the API call.
      */
     public JsonObjectRequest jsonParse() {
-        // Build the URL for the API request
-        StringBuilder urlBuilder = new StringBuilder("https://app.ticketmaster.com/").append(root).append("?");
-        for (String queryParam : queryParams) {
-            urlBuilder.append(queryParam).append("&");
-        }
-        String url = urlBuilder.append(API_KEY).toString();
+        String url = buildURL();
+        
         Log.d("api", url);
 
         // Create a JsonObjectRequest for the API call
