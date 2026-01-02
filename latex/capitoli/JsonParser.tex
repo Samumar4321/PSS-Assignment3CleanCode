@@ -5,36 +5,62 @@
     \inputminted[linenos, frame=lines]{java}{../old/JsonParser.java}
 
     \subsection{Analisi di Clean Code}
-    La classe presenta diversi problemi di Clean Code, analizziamo quindi il codice presente al suo interno.
+        \subsubsection{Nomi}
+        I nomi di variabili risultano significativi, con gli attributi della classe che rispecchiano ciò che rappresentano, con alcune notevoli eccezzioni:
+        \begin{itemize}
+            \item \textit{root} per quanto abbastanza esplicativo, non rappersenta il root dell'URL ma bensì il path dell'API, \textit{endpoint} o \textit{path} sarebbero pià esplicativi;
+            \item \textit{eventsList} riflette il contenuto della variabile, ma non è necessario specificare che si tratti di una lista, \textit{events} sarebbe sufficiente;
+            \item \textit{eventObj} riflette il contenuto ma non specifica che si tratti di un oggetto JSON, \textit{eventJson} potrebbe risultare più chiaro.
+        \end{itemize}
 
-    La funzione \textbf{jsonParse} risulta troppo massiccia e complessa, rendendo difficile capire a primo impatto cosa faccia e presentando diversi aspetti su cui poter agire.
+        Per le funzioni, invece, i nomi risultano poco chiari e spesso non riflettono ciò che la funzione svolge realmente:
+        \begin{itemize}
+            \item \textit{jsonParse()} non riflette il compito della funzione, che svolge molte altre operazioni oltre al semplice parsing di JSON come la creazione dell'URL, 
+            la gestione della connessione e infine il parsing del JSON e gestione degli errori.
+        \end{itemize}
 
-    Per iniziare il nome non riflette il compito che la funzione svolge, \textit{jsonParse()} suggerisce che la funzione analizzi del codice JSON, possibilmente estraendo delle informazioni,
-    ma al contrario la funzione eegue molte altre operazioni non inerenti all'analisi del JSON, un nome migliore potrebbe essere \textit{getEventsFromAPI()}
+        Anche la classe risulta malamente nominata, \textit{JsonParser} suggerisce una classe che esegue il parsing del JSON, in realtà questa si occupa anche di stabilire la connessione e gestirla.
     
-    Come anticipato, la funzione viola il \textbf{SRP (Single Responsibility Principle)} e il \textbf{CQS (Command Query Separation)}, si occupa infatti di:
-    \begin{itemize}
-        \item creare l'URL della API da chiamare;
-        \item scrivere sul Log informazioni di debug;
-        \item gestire la connessione HTTP verso la API;
-        \item effettuare la chiamata alla API di TicketMaster;
-        \item gestire la logica di parsing della risposta JSON;
-        \item gestire la logica di eventuali errori di connessione o risposta;
-    \end{itemize}
+        \subsubsection{Responsabilità}
+        Come anticipato la funzione \textit{jsonParse()} viola il \textbf{SRP (Single Responsibility Principle)} e il \textbf{CQS (Command Query Separation)}, occupandosi di diversi compiti 
+        quando potrebbe facilmente essere divisa in sotto funzioni: 
+        \begin{itemize}
+            \item creare l'URL della API da chiamare;
+            \item scrivere sul Log informazioni di debug;
+            \item gestire la connessione HTTP verso la API;
+            \item effettuare la chiamata alla API di TicketMaster;
+            \item gestire la logica di parsing della risposta JSON;
+            \item gestire la logica di eventuali errori di connessione o risposta;
+        \end{itemize}
 
-    Inoltre la funzione utilizza stringhe \textit{embedded} per gestire la richiesta, creazione e parsing delle risposte, che rendono modifiche futura più laboriose e complesse;
-    sarebbe opportuno usare variabili globali o costanti.
-    
-    Elevato annidamento delle funzioni, dovuto alla gestione degli errori e parsing del JSON eseguita con lambda functions, che complicano esponenzialmente la leggibilità del codice,
-    risolvibile estraendo i vari compiti in funzioni singole e separate.
-    
-    La riga 84 presenta inoltre un grosso problema di integrità e sicurezza, gli eventi vengono infatti modificati direttamente sulla variabile originale, senza passare per una variabile
-    locale intermedia, questò rischia di introdurre difficioltà di debug e problemi di concorrenza.
-    La riga 26 presenta anch'essa un problema simile, il valore della API key non dovrebbe essere hardcoded in chiaro nella classe.
+        Questi compiti dovrebbero essere estratti in funzioni separate, migliorando leggibilità e manutenzione del codice, riducendo contemporaneamente la complessità della funzione.
 
-    I nomi di variabili e funzioni sono perlopiù significativi e coerenti con il contesto di utilizzo, con alcune eccezzioni quali: \textit{Log.d} e \textit{Log.e} che potrebbero risultare poco chiari.
+        In generale tutta la classe dovrebbe modificata e divisa in due classi distinte:
+        \begin{itemize}
+            \item una che si occupi della gestione della connessione alla API di TicketMaster per recuperare i dati (gli eventi in questo caso);
+            \item una che si occupi di analizzare e parsare questi dati in formato JSON, estraendo le informazioni richieste.
+        \end{itemize}
 
-    Dal punto di vista dei commenti, la funzione presenta un commento generale che spiega lo scopo della funzione in maniera molto ambigua e generica, all'interno vi sono diversi commenti per delimitare e
-    specificare le funzioni di ogni blocco di codice, ciò risulta ridondante e superfluo ma necessario data la complessità della funzione.
+        \subsubsection{Commenti}
+        Dal punto di vista dei commenti, la classe ne presenta un numero eccessivo, alcuni commenti sono utili e chiari, la maggior parte invece interrompe il flusso del codice 
+        spiegando concetti ovvi e non fornendo informazioni utili.
 
+        La spiegazione degli attributi della classe è superflua, il nome e il contesto dovrebbero essere sufficienti a comprendere cosa rappresentano.
+
+        In particolare la funzione \textit{jsonParse()} presenta un commento generale che spiega in maniera poco chiara la sua funzionalità, e numerosi commenti all'interno che 
+        separano i blocchi di codice per funzionalità differenti, spesso spiegando banalità o fornendo informazioni poco utili.
+
+        SOno presenti anche commenti per codice ormai rimosso, come mostrato alla riga 40.
+
+        \subsubsection{Hardocoding}
+        La classe possiede un paio di problemi di embedding, in particolare la \textit{chiave API} è hardcoded in chiaro come attributo statico della classe, 
+        ciò rappresenta un problema di sicurezza e manutenzione in caso di futuri cambiamenti.
+
+        Un'altra stringa che risulta essere hardcoded è l'URL base della API, che dovrebbe essere spostata in una costante o variabile globale così come la stringa \textit{\textunderscore embedded}, 
+        necessaria per eseguire il parsing della risposta JSON. 
+
+        \subsubsection{Gestione degli errori}
+        La gestione degli errori è abbastanza approssimativa; spesso si cattura l'eccezione senza avere comportamenti condizionati al tipo di errore e non si comunica all'utente l'avvenuto problema,
+        lasciandolo ad aspettare un evento che non si verificherà mai.
+        
     \subsection{Code Refactoring}
