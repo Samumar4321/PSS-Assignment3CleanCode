@@ -22,91 +22,86 @@ import it.marcosoft.ticketwave.EventModel.Event;
  * Utility class for parsing JSON responses from the Ticketmaster API.
  */
 public class JsonParser {
-    // API key for accessing the Ticketmaster API
     private static final String API_KEY = "apikey=KqtxCDlnofSteZ63m7gmezFR8PR34o78";
+    
+    private static final String API_URL = "https://app.ticketmaster.com/"
 
-    // Endpoint for the API request
-    private final String root;
+    private final String endpoint;
 
-    // Query parameters for the API request
     private final List<String> queryParams;
 
-    // List to store the parsed events
-    private final List<Event> eventsList;
+    private final List<Event> events;
 
-    // Android application context
     private final OnEventsParsedListener onEventsParsedListener;
 
-    // RecyclerView to display the parsed events
-
-    /**
-     * Constructor for the JsonParser class.
-     *
-     * @param root          The root endpoint for the API request.
-     * @param queryParams   List of query parameters for the API request.
-     */
-    public JsonParser(String root, List<String> queryParams, OnEventsParsedListener listener) {
-        this.root = root;
+    public JsonParser(String endpoint, List<String> queryParams, OnEventsParsedListener listener) {
+        this.endpoint = endpoint;
         this.queryParams = queryParams;
-        this.eventsList = new ArrayList<>();
+        this.events = new ArrayList<>();
         this.onEventsParsedListener = listener;
     }
 
     private String buildURL(){
-        StringBuilder urlBuilder = new StringBuilder("https://app.ticketmaster.com/").append(root).append("?");
+        StringBuilder urlBuilder = new StringBuilder(API_URL).append(endpoint).append("?");
         for (String queryParam : queryParams) {
             urlBuilder.append(queryParam).append("&");
         }
         return urlBuilder.append(API_KEY).toString();
     }
     
-    /**
-     * Creates a JsonObjectRequest for the API call.
-     *
-     * @return JsonObjectRequest for the API call.
-     */
-    public JsonObjectRequest jsonParse() {
-        String url = buildURL();
-        
-        Log.d("api", url);
+    private void handleResponse(JSONObject response) {
+        try {
+            if (ENDPOINT_EVENTS.equals(endpoint)) {
+                List<Event> parsedEvents = parseEventsFromJson(response);
+                notifyListener(parsedEvents);
+            } else {
+                Log.w(TAG, "Unsupported endpoint: " + endpoint);
+            }
+        } catch (JSONException e) {
+            Log.e(TAG, "JSON Parsing error", e);
+        }
+    }
 
-        // Create a JsonObjectRequest for the API call
+    private List<Event> parseEventsFromJson(JSONObject response) throws JSONException {
+        List<Event> eventsList = new ArrayList<>();
+        
+        if (!response.has(KEY_EMBEDDED)) {
+            return eventsList; // Return empty list instead of crashing
+        }
+
+        JSONObject embedded = response.getJSONObject(KEY_EMBEDDED);
+        JSONArray eventsArray = embedded.getJSONArray(KEY_EVENTS);
+
+        for (int i = 0; i < eventsArray.length(); i++) {
+            JSONObject eventObj = eventsArray.getJSONObject(i);
+            eventsList.add(new Event(eventObj));
+        }
+        
+        return eventsList;
+    }
+
+    private void notifyListener(List<Event> events) {
+        if (listener != null) {
+            listener.onEventsParsed(events);
+        }
+    }
+
+    /**
+     * Creates a JsonObjectRequest specifically for fetching events.
+     *
+     * @return JsonObjectRequest ready to be added to the request queue.
+     */
+    public JsonObjectRequest createEventsRequest() {
+        String url = buildUrl();
+        Log.d(TAG, "Request URL: " + url);
 
         return new JsonObjectRequest(
-                Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
-
-            @Override
-            public void onResponse(JSONObject response) {
-                try {
-                    // Parse the JSON response based on the API endpoint
-                    if ("discovery/v2/events".equals(root)) {
-                        JSONObject embedded = response.getJSONObject("_embedded");
-                        JSONArray events = embedded.getJSONArray("events");
-                        for (int i = 0; i < events.length(); i++) {
-                            JSONObject eventObj = events.getJSONObject(i);
-                            Event event = new Event(eventObj);
-                            eventsList.add(event);
-                        }
-                    } else {
-                        // Handle unknown API endpoint
-                        throw new Exception();
-                    }
-                } catch (Exception e) {
-                    // Handle the exception (e.g., log it)
-                    Log.e("JsonParser", "Error parsing JSON", e);
-                }
-
-                if (onEventsParsedListener != null) {
-                    onEventsParsedListener.onEventsParsed(eventsList);
-                }
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                // Handle the Volley error (e.g., log it)
-                Log.e("JsonParser", "Volley error", error);
-            }
-        });
+            Request.Method.GET,
+            url,
+            null,
+            response -> handleResponse(response),
+            error -> Log.e(TAG, "Volley error: " + error.getMessage())
+        );
     }
     
     public interface OnEventsParsedListener {
