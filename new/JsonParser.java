@@ -66,7 +66,7 @@ public class JsonParser {
         List<Event> eventsList = new ArrayList<>();
         
         if (!response.has(KEY_EMBEDDED)) {
-            return eventsList; // Return empty list instead of crashing
+            return eventsList; 
         }
 
         JSONObject embedded = response.getJSONObject(KEY_EMBEDDED);
@@ -86,11 +86,6 @@ public class JsonParser {
         }
     }
 
-    /**
-     * Creates a JsonObjectRequest specifically for fetching events.
-     *
-     * @return JsonObjectRequest ready to be added to the request queue.
-     */
     public JsonObjectRequest createEventsRequest() {
         String url = buildUrl();
         Log.d(TAG, "Request URL: " + url);
