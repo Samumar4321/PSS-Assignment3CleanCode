@@ -1,244 +1,244 @@
-\documentclass[../main.tex]{subfiles}
-\begin{document}
-\chapter{Analisi di EventAdapter}
+\section{Analisi di EventAdapter}
 \label{eventAdapter}
 
-\section{Codice}
-\begin{lstlisting}[style=JavaStyle]
-package it.marcosoft.ticketwave.adapter;
+\subsection{Codice}
+% \begin{lstlisting}[style=JavaStyle]
+% package it.marcosoft.ticketwave.adapter;
 
-import android.annotation.SuppressLint;
-import android.content.Context;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-import android.graphics.drawable.AnimatedVectorDrawable;
-import android.graphics.drawable.Drawable;
-import android.util.Log;
-import android.view.GestureDetector;
-import android.view.LayoutInflater;
-import android.view.MotionEvent;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.TextView;
-import android.widget.Toast;
+% import android.annotation.SuppressLint;
+% import android.content.Context;
+% import android.database.Cursor;
+% import android.database.sqlite.SQLiteDatabase;
+% import android.graphics.drawable.AnimatedVectorDrawable;
+% import android.graphics.drawable.Drawable;
+% import android.util.Log;
+% import android.view.GestureDetector;
+% import android.view.LayoutInflater;
+% import android.view.MotionEvent;
+% import android.view.View;
+% import android.view.ViewGroup;
+% import android.widget.ImageView;
+% import android.widget.LinearLayout;
+% import android.widget.TextView;
+% import android.widget.Toast;
 
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.vectordrawable.graphics.drawable.AnimatedVectorDrawableCompat;
+% import androidx.annotation.NonNull;
+% import androidx.recyclerview.widget.RecyclerView;
+% import androidx.vectordrawable.graphics.drawable.AnimatedVectorDrawableCompat;
 
-import com.squareup.picasso.Picasso;
+% import com.squareup.picasso.Picasso;
 
-import java.util.List;
+% import java.util.List;
 
-import it.marcosoft.ticketwave.EventModel.Event;
-import it.marcosoft.ticketwave.R;
-import it.marcosoft.ticketwave.data.LikedData;
-import it.marcosoft.ticketwave.util.db.DBHelperLiked;
+% import it.marcosoft.ticketwave.EventModel.Event;
+% import it.marcosoft.ticketwave.R;
+% import it.marcosoft.ticketwave.data.LikedData;
+% import it.marcosoft.ticketwave.util.db.DBHelperLiked;
 
-public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> {
+% public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> {
 
-    // VARIABILI PER ANIMAZIONE LIKE
-    ImageView heart;
-    ImageView cover;
-    AnimatedVectorDrawableCompat avd;
-    AnimatedVectorDrawable avd2;
+%     // VARIABILI PER ANIMAZIONE LIKE
+%     ImageView heart;
+%     ImageView cover;
+%     AnimatedVectorDrawableCompat avd;
+%     AnimatedVectorDrawable avd2;
 
-    // VARIABILI PER ANIMAZIONE DISLIKE
-    ImageView disheart;
-    AnimatedVectorDrawableCompat avd3;
-    AnimatedVectorDrawable avd4;
-    private final LayoutInflater layoutInflater;
-    private List<Event> eventList;
+%     // VARIABILI PER ANIMAZIONE DISLIKE
+%     ImageView disheart;
+%     AnimatedVectorDrawableCompat avd3;
+%     AnimatedVectorDrawable avd4;
+%     private final LayoutInflater layoutInflater;
+%     private List<Event> eventList;
 
-    public EventAdapter(Context context, List<Event> eventList) {
-        this.layoutInflater = LayoutInflater.from(context);
-        this.eventList = eventList;
-    }
-
-
-    @NonNull
-    @Override
-    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = layoutInflater.inflate(R.layout.event_list_item_card, parent, false);
-        return new ViewHolder(view);
-    }
-
-    @SuppressLint("ClickableViewAccessibility")
-    @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        Event event = eventList.get(position);
-        // Retrieve data from the event object
-        String title = event.getName();
-        String location = event.getVenue().getName();
-        String date = event.getDate();
-        String description = event.getClassifications().get(0).toStringPretty();
-        String imgUrl = event.getImages().get(0).getUrlImage();
-        String id = event.getId();
+%     public EventAdapter(Context context, List<Event> eventList) {
+%         this.layoutInflater = LayoutInflater.from(context);
+%         this.eventList = eventList;
+%     }
 
 
-        // Bind data to the ViewHolder
-        holder.textTitle.setText(title);
-        holder.textLocation.setText(location);
-        holder.textDate.setText(date);
-        holder.textDescription.setText(description);
-        holder.tagCard.setTag(id);
-        Picasso.get().load(imgUrl).into(holder.imageView);
+%     @NonNull
+%     @Override
+%     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+%         View view = layoutInflater.inflate(R.layout.event_list_item_card, parent, false);
+%         return new ViewHolder(view);
+%     }
 
-        // Set the click listener for the card view
-        GestureDetector gestureDetector = new GestureDetector(holder.itemView.getContext(),
-                new GestureDetector.SimpleOnGestureListener() {
-                    @Override
-                    public boolean onSingleTapConfirmed(@NonNull MotionEvent e) {
-                        // Handle single tap (optional)
-                        return super.onSingleTapConfirmed(e);
-                    }
-
-                    @Override
-                    public boolean onDoubleTap(@NonNull MotionEvent e) {
-
-                        //PREPARAZIONE PER ANIMAZIONE LIKE/DISLIKE
-                        cover = holder.itemView.findViewById(R.id.event_image);
-                        heart = holder.itemView.findViewById(R.id.like_animation);
-                        disheart = holder.itemView.findViewById(R.id.dislike_animation);
-                        final Drawable drawable=heart.getDrawable();
-                        final Drawable drawable2=disheart.getDrawable();
+%     @SuppressLint("ClickableViewAccessibility")
+%     @Override
+%     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+%         Event event = eventList.get(position);
+%         // Retrieve data from the event object
+%         String title = event.getName();
+%         String location = event.getVenue().getName();
+%         String date = event.getDate();
+%         String description = event.getClassifications().get(0).toStringPretty();
+%         String imgUrl = event.getImages().get(0).getUrlImage();
+%         String id = event.getId();
 
 
-                        String idEvent = String.valueOf(holder.tagCard.getTag());
-                        String userId = "userId"; // Sostituisci "userId" con l'id dell'utente reale
+%         // Bind data to the ViewHolder
+%         holder.textTitle.setText(title);
+%         holder.textLocation.setText(location);
+%         holder.textDate.setText(date);
+%         holder.textDescription.setText(description);
+%         holder.tagCard.setTag(id);
+%         Picasso.get().load(imgUrl).into(holder.imageView);
 
-                        // Verifica se l'evento e gia presente nel database
-                        DBHelperLiked dbHelper = new DBHelperLiked(holder.itemView.getContext());
-                        SQLiteDatabase db = dbHelper.getReadableDatabase();
+%         // Set the click listener for the card view
+%         GestureDetector gestureDetector = new GestureDetector(holder.itemView.getContext(),
+%                 new GestureDetector.SimpleOnGestureListener() {
+%                     @Override
+%                     public boolean onSingleTapConfirmed(@NonNull MotionEvent e) {
+%                         // Handle single tap (optional)
+%                         return super.onSingleTapConfirmed(e);
+%                     }
 
-                        String selection = DBHelperLiked.COLUMN_EVENT_ID + " = ? AND " + DBHelperLiked.COLUMN_USER_ID + " = ?";
-                        String[] selectionArgs = {idEvent, userId};
+%                     @Override
+%                     public boolean onDoubleTap(@NonNull MotionEvent e) {
 
-                        Cursor cursor = db.query(
-                                DBHelperLiked.TABLE_LIKED_EVENTS,
-                                null,
-                                selection,
-                                selectionArgs,
-                                null,
-                                null,
-                                null
-                        );
-
-                        boolean isEventAlreadyLiked = cursor.getCount() > 0;
-                        cursor.close();
-                        db.close();
-
-                        // Aggiungi l'evento al database solo se non e gia presente
-                        if (!isEventAlreadyLiked) {
-                            dbHelper = new DBHelperLiked(holder.itemView.getContext());
-                            db = dbHelper.getWritableDatabase();
-
-                            //ANIMAZIONE DEL LIKE
-                            if (heart != null) {
-                                heart.setAlpha(1f);
-                            }
-                            if (drawable instanceof AnimatedVectorDrawableCompat){
-                                avd = (AnimatedVectorDrawableCompat) drawable;
-                                avd.start();
-                            } else if (drawable instanceof AnimatedVectorDrawable) {
-                                avd2=(AnimatedVectorDrawable) drawable;
-                                avd2.start();
-                            }
-
-                            // Utilizza la nuova classe LikedData estesa
-                            LikedData likedData = new LikedData(
-                                    idEvent,
-                                    userId,
-                                    title,
-                                    location,
-                                    date,
-                                    description,
-                                    imgUrl
-                            );
-
-                            dbHelper.addLikedEvent(likedData);
-                            db.close();
-                            Toast.makeText(holder.itemView.getContext(), "Liked event!", Toast.LENGTH_SHORT).show();
-
-                        } else {
-                            // Evento gia presente nel database
-                            dbHelper = new DBHelperLiked(holder.itemView.getContext());
-                            dbHelper.getWritableDatabase();
-
-                            // Utilizza la nuova classe LikedData estesa
-                            LikedData likedData = new LikedData(
-                                    idEvent,
-                                    userId,
-                                    title,
-                                    location,
-                                    date,
-                                    description,
-                                    imgUrl
-                            );
-                            dbHelper.removeLikedEvent(likedData.getEventId());
+%                         //PREPARAZIONE PER ANIMAZIONE LIKE/DISLIKE
+%                         cover = holder.itemView.findViewById(R.id.event_image);
+%                         heart = holder.itemView.findViewById(R.id.like_animation);
+%                         disheart = holder.itemView.findViewById(R.id.dislike_animation);
+%                         final Drawable drawable=heart.getDrawable();
+%                         final Drawable drawable2=disheart.getDrawable();
 
 
-                            //ANIMAZIONE DEL DISLIKE
-                            if (disheart != null) {
-                                disheart.setAlpha(1f);
-                            }
-                            if (drawable2 instanceof AnimatedVectorDrawableCompat){
-                                avd3 = (AnimatedVectorDrawableCompat) drawable2;
-                                avd3.start();
-                            } else if (drawable2 instanceof AnimatedVectorDrawable) {
-                                avd4=(AnimatedVectorDrawable) drawable2;
-                                avd4.start();
-                            }
+%                         String idEvent = String.valueOf(holder.tagCard.getTag());
+%                         String userId = "userId"; // Sostituisci "userId" con l'id dell'utente reale
 
-                            Toast.makeText(holder.itemView.getContext(), "Disliked event!", Toast.LENGTH_SHORT).show();
-                        }
+%                         // Verifica se l'evento e gia presente nel database
+%                         DBHelperLiked dbHelper = new DBHelperLiked(holder.itemView.getContext());
+%                         SQLiteDatabase db = dbHelper.getReadableDatabase();
 
-                        return true;
-                    }
-                });
+%                         String selection = DBHelperLiked.COLUMN_EVENT_ID + " = ? AND " + DBHelperLiked.COLUMN_USER_ID + " = ?";
+%                         String[] selectionArgs = {idEvent, userId};
 
-        holder.itemView.setOnTouchListener((v, eventCard) -> gestureDetector.onTouchEvent(eventCard));
+%                         Cursor cursor = db.query(
+%                                 DBHelperLiked.TABLE_LIKED_EVENTS,
+%                                 null,
+%                                 selection,
+%                                 selectionArgs,
+%                                 null,
+%                                 null,
+%                                 null
+%                         );
 
-    }
+%                         boolean isEventAlreadyLiked = cursor.getCount() > 0;
+%                         cursor.close();
+%                         db.close();
 
-    @Override
-    public int getItemCount() {
-        return eventList.size();
-    }
+%                         // Aggiungi l'evento al database solo se non e gia presente
+%                         if (!isEventAlreadyLiked) {
+%                             dbHelper = new DBHelperLiked(holder.itemView.getContext());
+%                             db = dbHelper.getWritableDatabase();
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
+%                             //ANIMAZIONE DEL LIKE
+%                             if (heart != null) {
+%                                 heart.setAlpha(1f);
+%                             }
+%                             if (drawable instanceof AnimatedVectorDrawableCompat){
+%                                 avd = (AnimatedVectorDrawableCompat) drawable;
+%                                 avd.start();
+%                             } else if (drawable instanceof AnimatedVectorDrawable) {
+%                                 avd2=(AnimatedVectorDrawable) drawable;
+%                                 avd2.start();
+%                             }
 
-        final TextView textTitle;
-        final TextView textLocation;
-        final TextView textDate;
-        final TextView textDescription;
-        final ImageView imageView;
-        final LinearLayout tagCard;
+%                             // Utilizza la nuova classe LikedData estesa
+%                             LikedData likedData = new LikedData(
+%                                     idEvent,
+%                                     userId,
+%                                     title,
+%                                     location,
+%                                     date,
+%                                     description,
+%                                     imgUrl
+%                             );
 
-        public ViewHolder(@NonNull View itemView) {
-            super(itemView);
-            textTitle = itemView.findViewById(R.id.event_name);
-            textLocation = itemView.findViewById(R.id.event_location);
-            textDate = itemView.findViewById(R.id.event_date);
-            imageView = itemView.findViewById(R.id.event_image);
-            textDescription = itemView.findViewById(R.id.event_description);
-            tagCard = itemView.findViewById(R.id.cardId);
-        }
-    }
+%                             dbHelper.addLikedEvent(likedData);
+%                             db.close();
+%                             Toast.makeText(holder.itemView.getContext(), "Liked event!", Toast.LENGTH_SHORT).show();
+
+%                         } else {
+%                             // Evento gia presente nel database
+%                             dbHelper = new DBHelperLiked(holder.itemView.getContext());
+%                             dbHelper.getWritableDatabase();
+
+%                             // Utilizza la nuova classe LikedData estesa
+%                             LikedData likedData = new LikedData(
+%                                     idEvent,
+%                                     userId,
+%                                     title,
+%                                     location,
+%                                     date,
+%                                     description,
+%                                     imgUrl
+%                             );
+%                             dbHelper.removeLikedEvent(likedData.getEventId());
 
 
-    @SuppressLint("NotifyDataSetChanged")
-    public void setEventList(List<Event> events) {
-        this.eventList = events;
-        notifyDataSetChanged();
-    }
-}
-\end{lstlisting}
+%                             //ANIMAZIONE DEL DISLIKE
+%                             if (disheart != null) {
+%                                 disheart.setAlpha(1f);
+%                             }
+%                             if (drawable2 instanceof AnimatedVectorDrawableCompat){
+%                                 avd3 = (AnimatedVectorDrawableCompat) drawable2;
+%                                 avd3.start();
+%                             } else if (drawable2 instanceof AnimatedVectorDrawable) {
+%                                 avd4=(AnimatedVectorDrawable) drawable2;
+%                                 avd4.start();
+%                             }
 
-\section{Analisi del codice}
-\subsection{Nomi}
+%                             Toast.makeText(holder.itemView.getContext(), "Disliked event!", Toast.LENGTH_SHORT).show();
+%                         }
+
+%                         return true;
+%                     }
+%                 });
+
+%         holder.itemView.setOnTouchListener((v, eventCard) -> gestureDetector.onTouchEvent(eventCard));
+
+%     }
+
+%     @Override
+%     public int getItemCount() {
+%         return eventList.size();
+%     }
+
+%     public static class ViewHolder extends RecyclerView.ViewHolder {
+
+%         final TextView textTitle;
+%         final TextView textLocation;
+%         final TextView textDate;
+%         final TextView textDescription;
+%         final ImageView imageView;
+%         final LinearLayout tagCard;
+
+%         public ViewHolder(@NonNull View itemView) {
+%             super(itemView);
+%             textTitle = itemView.findViewById(R.id.event_name);
+%             textLocation = itemView.findViewById(R.id.event_location);
+%             textDate = itemView.findViewById(R.id.event_date);
+%             imageView = itemView.findViewById(R.id.event_image);
+%             textDescription = itemView.findViewById(R.id.event_description);
+%             tagCard = itemView.findViewById(R.id.cardId);
+%         }
+%     }
+
+
+%     @SuppressLint("NotifyDataSetChanged")
+%     public void setEventList(List<Event> events) {
+%         this.eventList = events;
+%         notifyDataSetChanged();
+%     }
+% }
+% \end{lstlisting}
+
+\inputminted[linenos, frame=lines]{java}{../old/EventAdapter.java}
+
+\subsection{Analisi del codice}
+\subsubsection{Nomi}
 All'interno del codice sono presenti delle variabili di classe che possono essere dichiarate direttamente all'interno delle funzioni, una volta riscritte correttamente.
 Inoltre, molte di esse presentano un nome che introduce ambiguità, perchè poco esplicativo. L'esempio più lampante lo forniscono:
 \begin{itemize}
@@ -249,7 +249,7 @@ Inoltre, molte di esse presentano un nome che introduce ambiguità, perchè poco
 \end{itemize}
 A dimostrazione dell'ambiguità dei nomi troviamo i commenti \verb|//VARIABILI PER ANIMAZIONE LIKE|\\ e \verb|//VARIABILI PER ANIMAZIONE DISLIKE|, scritti per spiegare per cosa verranno utilizzate le variabili.
 I nomi delle funzioni, invece, risultano essere corretti, in quanto sono tutti degli \verb|@Override| di funzioni già esistenti.
-\subsection{Commenti}
+\subsubsection{Commenti}
 Nel codice originale non sono presenti commenti a parti di codice vecchie o inutilizzate. Sono però presenti svariati commenti a parti di codice che dovrebbero essere delle funzioni a se stanti e che diventerebbero autoesplicative tramite il nome:
 \begin{itemize}
     \item \verb|// Retrieve data from the event object|
@@ -274,11 +274,11 @@ Altri commenti risultano invece superflui:
     \item \verb|// Evento già presente nel database|
 \end{itemize}
 
-\subsection{Formattazione}
+\subsubsection{Formattazione}
 L'ordine con cui le funzioni sono state scritte è corretto, così come l'indentazione del codice, quindi i concetti di \verb|distanza verticale| e di \verb|lunghezza orizzontale| vengono rispettati.
-\subsection{Funzioni}
+\subsubsection{Funzioni}
 La funzione \verb|onBindViewHolder| risulta essere eccessivamente lunga e quindi dispersiva. Molte parti di codice al suo interno dovrebbero essere funzioni esterne, dato che svolgono un compito isolabile, come per esempio:
-\begin{lstlisting}[style=JavaStyle]
+\begin{minted}{java}
 // Bind data to the ViewHolder
         holder.textTitle.setText(title);
         holder.textLocation.setText(location);
@@ -287,239 +287,240 @@ La funzione \verb|onBindViewHolder| risulta essere eccessivamente lunga e quindi
         holder.tagCard.setTag(id);
         Picasso.get().load(imgUrl).into(holder.imageView);
 }
-\end{lstlisting}
+\end{minted}
 Le altre funzioni invece risultano scritte correttamente, in quanto tutte svolgono un unico compito, hanno nomi appropriati e non necessitano di un numero elevato di parametri.
 
-\section{Codice ristrutturato}
-\begin{lstlisting}[style=JavaStyle]
-package it.marcosoft.ticketwave.adapter;
+\subsection{Codice ristrutturato}
+% \begin{lstlisting}[style=JavaStyle]
+% package it.marcosoft.ticketwave.adapter;
 
-import android.annotation.SuppressLint;
-import android.content.Context;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-import android.graphics.drawable.AnimatedVectorDrawable;
-import android.graphics.drawable.Drawable;
-import android.view.GestureDetector;
-import android.view.LayoutInflater;
-import android.view.MotionEvent;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.TextView;
-import android.widget.Toast;
+% import android.annotation.SuppressLint;
+% import android.content.Context;
+% import android.database.Cursor;
+% import android.database.sqlite.SQLiteDatabase;
+% import android.graphics.drawable.AnimatedVectorDrawable;
+% import android.graphics.drawable.Drawable;
+% import android.view.GestureDetector;
+% import android.view.LayoutInflater;
+% import android.view.MotionEvent;
+% import android.view.View;
+% import android.view.ViewGroup;
+% import android.widget.ImageView;
+% import android.widget.LinearLayout;
+% import android.widget.TextView;
+% import android.widget.Toast;
 
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.vectordrawable.graphics.drawable.AnimatedVectorDrawableCompat;
+% import androidx.annotation.NonNull;
+% import androidx.recyclerview.widget.RecyclerView;
+% import androidx.vectordrawable.graphics.drawable.AnimatedVectorDrawableCompat;
 
-import com.squareup.picasso.Picasso;
+% import com.squareup.picasso.Picasso;
 
-import java.util.List;
+% import java.util.List;
 
-import it.marcosoft.ticketwave.EventModel.Event;
-import it.marcosoft.ticketwave.R;
-import it.marcosoft.ticketwave.data.LikedData;
-import it.marcosoft.ticketwave.util.db.DBHelperLiked;
+% import it.marcosoft.ticketwave.EventModel.Event;
+% import it.marcosoft.ticketwave.R;
+% import it.marcosoft.ticketwave.data.LikedData;
+% import it.marcosoft.ticketwave.util.db.DBHelperLiked;
 
-public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> {
-    private final LayoutInflater layoutInflater;
-    private List<Event> eventList;
+% public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> {
+%     private final LayoutInflater layoutInflater;
+%     private List<Event> eventList;
 
-    public EventAdapter(Context context, List<Event> eventList) {
-        this.layoutInflater = LayoutInflater.from(context);
-        this.eventList = eventList;
-    }
+%     public EventAdapter(Context context, List<Event> eventList) {
+%         this.layoutInflater = LayoutInflater.from(context);
+%         this.eventList = eventList;
+%     }
 
 
-    @NonNull
-    @Override
-    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = layoutInflater.inflate(R.layout.event_list_item_card, parent, false);
-        return new ViewHolder(view);
-    }
+%     @NonNull
+%     @Override
+%     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+%         View view = layoutInflater.inflate(R.layout.event_list_item_card, parent, false);
+%         return new ViewHolder(view);
+%     }
 
-    @SuppressLint("ClickableViewAccessibility")
-    @Override
-    public void onBindViewHolder(@NonNull ViewHolder viewHolder, int position) {
-        Event event = eventList.get(position);
+%     @SuppressLint("ClickableViewAccessibility")
+%     @Override
+%     public void onBindViewHolder(@NonNull ViewHolder viewHolder, int position) {
+%         Event event = eventList.get(position);
 
-        EventInfo eventInfo = mapEventToEventInfo(event);
+%         EventInfo eventInfo = mapEventToEventInfo(event);
 
-        bindEventInfoToViewHolder(viewHolder, eventInfo);
+%         bindEventInfoToViewHolder(viewHolder, eventInfo);
         
-        setupDoubleTapLikeGesture(viewHolder, eventInfo);
-    }
+%         setupDoubleTapLikeGesture(viewHolder, eventInfo);
+%     }
 
-    private EventInfo mapEventToEventInfo(Event event){
-        String description = "";
-        String imgUrl = "";
+%     private EventInfo mapEventToEventInfo(Event event){
+%         String description = "";
+%         String imgUrl = "";
         
-        if(!event.getClassifications().isEmpty())
-            description = event.getClassifications().get(0).toStringPretty();
+%         if(!event.getClassifications().isEmpty())
+%             description = event.getClassifications().get(0).toStringPretty();
         
-        if(!event.getImages().isEmpty())
-            imgUrl = event.getImages().get(0).getUrlImage();
+%         if(!event.getImages().isEmpty())
+%             imgUrl = event.getImages().get(0).getUrlImage();
 
-        return new EventInfo(
-            event.getName(),
-            event.getVenue().getName(),
-            event.getDate(),
-            description,
-            imgUrl,
-            event.getId()
-        );
-    }
+%         return new EventInfo(
+%             event.getName(),
+%             event.getVenue().getName(),
+%             event.getDate(),
+%             description,
+%             imgUrl,
+%             event.getId()
+%         );
+%     }
 
-    private void bindEventInfoToViewHolder(ViewHolder viewHolder, EventInfo eventInfo){
-        viewHolder.textTitle.setText(eventInfo.title());
-        viewHolder.textLocation.setText(eventInfo.venueName());
-        viewHolder.textDate.setText(eventInfo.eventDate());
-        viewHolder.textDescription.setText(eventInfo.description());
-        viewHolder.tagCard.setTag(eventInfo.eventId());
-        Picasso.get().load(eventInfo.imgUrl()).into(viewHolder.imageView);
-    }
+%     private void bindEventInfoToViewHolder(ViewHolder viewHolder, EventInfo eventInfo){
+%         viewHolder.textTitle.setText(eventInfo.title());
+%         viewHolder.textLocation.setText(eventInfo.venueName());
+%         viewHolder.textDate.setText(eventInfo.eventDate());
+%         viewHolder.textDescription.setText(eventInfo.description());
+%         viewHolder.tagCard.setTag(eventInfo.eventId());
+%         Picasso.get().load(eventInfo.imgUrl()).into(viewHolder.imageView);
+%     }
 
-    @SuppressLint("ClickableViewAccessibility")
-    private void setupDoubleTapLikeGesture(ViewHolder viewHolder, EventInfo eventInfo){
-        GestureDetector gestureDetector = new GestureDetector(viewHolder.itemView.getContext(),
-                new GestureDetector.SimpleOnGestureListener() {
-                    @Override
-                    public boolean onSingleTapConfirmed(@NonNull MotionEvent e) {
-                        return super.onSingleTapConfirmed(e);
-                    }
+%     @SuppressLint("ClickableViewAccessibility")
+%     private void setupDoubleTapLikeGesture(ViewHolder viewHolder, EventInfo eventInfo){
+%         GestureDetector gestureDetector = new GestureDetector(viewHolder.itemView.getContext(),
+%                 new GestureDetector.SimpleOnGestureListener() {
+%                     @Override
+%                     public boolean onSingleTapConfirmed(@NonNull MotionEvent e) {
+%                         return super.onSingleTapConfirmed(e);
+%                     }
 
-                    @Override
-                    public boolean onDoubleTap(@NonNull MotionEvent e) {
-                        toggleLikeStatus(viewHolder, eventInfo);
-                        return true;
-                    }
-                });
+%                     @Override
+%                     public boolean onDoubleTap(@NonNull MotionEvent e) {
+%                         toggleLikeStatus(viewHolder, eventInfo);
+%                         return true;
+%                     }
+%                 });
                 
-        viewHolder.itemView.setOnTouchListener((v, eventCard) -> gestureDetector.onTouchEvent(eventCard));
-    }
+%         viewHolder.itemView.setOnTouchListener((v, eventCard) -> gestureDetector.onTouchEvent(eventCard));
+%     }
 
-    private void toggleLikeStatus(ViewHolder viewHolder, EventInfo eventInfo){
-        String userId = "userId";
+%     private void toggleLikeStatus(ViewHolder viewHolder, EventInfo eventInfo){
+%         String userId = "userId";
 
-        if (isEventLiked(viewHolder.itemView.getContext(), eventInfo.eventId(), userId)) {
-            removeEventFromLiked(viewHolder, eventInfo, userId);
-        } else {
-            addEventToLiked(viewHolder, eventInfo, userId);
-        }
-    }
+%         if (isEventLiked(viewHolder.itemView.getContext(), eventInfo.eventId(), userId)) {
+%             removeEventFromLiked(viewHolder, eventInfo, userId);
+%         } else {
+%             addEventToLiked(viewHolder, eventInfo, userId);
+%         }
+%     }
 
-    private boolean isEventLiked(Context context, String eventId, String userId) {
-        DBHelperLiked dbHelper = new DBHelperLiked(context);
-        SQLiteDatabase db = dbHelper.getReadableDatabase();
+%     private boolean isEventLiked(Context context, String eventId, String userId) {
+%         DBHelperLiked dbHelper = new DBHelperLiked(context);
+%         SQLiteDatabase db = dbHelper.getReadableDatabase();
 
-        String selection = DBHelperLiked.COLUMN_EVENT_ID + " = ? AND " +
-                DBHelperLiked.COLUMN_USER_ID + " = ?";
-        String[] selectionArgs = {eventId, userId};
+%         String selection = DBHelperLiked.COLUMN_EVENT_ID + " = ? AND " +
+%                 DBHelperLiked.COLUMN_USER_ID + " = ?";
+%         String[] selectionArgs = {eventId, userId};
 
-        Cursor cursor = db.query(
-                DBHelperLiked.TABLE_LIKED_EVENTS,
-                null,
-                selection,
-                selectionArgs,
-                null,
-                null,
-                null
-        );
+%         Cursor cursor = db.query(
+%                 DBHelperLiked.TABLE_LIKED_EVENTS,
+%                 null,
+%                 selection,
+%                 selectionArgs,
+%                 null,
+%                 null,
+%                 null
+%         );
 
-        boolean eventLiked = cursor.getCount() > 0;
-        cursor.close();
-        db.close();
+%         boolean eventLiked = cursor.getCount() > 0;
+%         cursor.close();
+%         db.close();
 
-        return eventLiked;
-    }
+%         return eventLiked;
+%     }
 
-    private void removeEventFromLiked(ViewHolder viewHolder, EventInfo eventInfo, String userId) {
-        ImageView dislikeAnimationView = viewHolder.itemView.findViewById(R.id.dislike_animation);
-        playAnimation(dislikeAnimationView);
+%     private void removeEventFromLiked(ViewHolder viewHolder, EventInfo eventInfo, String userId) {
+%         ImageView dislikeAnimationView = viewHolder.itemView.findViewById(R.id.dislike_animation);
+%         playAnimation(dislikeAnimationView);
 
-        DBHelperLiked dbHelper = new DBHelperLiked(viewHolder.itemView.getContext());
-        dbHelper.removeLikedEvent(eventInfo.eventId());
+%         DBHelperLiked dbHelper = new DBHelperLiked(viewHolder.itemView.getContext());
+%         dbHelper.removeLikedEvent(eventInfo.eventId());
 
-        Toast.makeText(viewHolder.itemView.getContext(),
-                "Disliked event!", Toast.LENGTH_SHORT).show();
-    }
+%         Toast.makeText(viewHolder.itemView.getContext(),
+%                 "Disliked event!", Toast.LENGTH_SHORT).show();
+%     }
 
-    private void addEventToLiked(ViewHolder viewHolder, EventInfo eventInfo, String userId) {
-        ImageView likeAnimationView = viewHolder.itemView.findViewById(R.id.like_animation);
-        playAnimation(likeAnimationView);
+%     private void addEventToLiked(ViewHolder viewHolder, EventInfo eventInfo, String userId) {
+%         ImageView likeAnimationView = viewHolder.itemView.findViewById(R.id.like_animation);
+%         playAnimation(likeAnimationView);
 
-        DBHelperLiked dbHelper = new DBHelperLiked(viewHolder.itemView.getContext());
-        dbHelper.addLikedEvent(new LikedData(
-                eventInfo.eventId(),
-                userId,
-                eventInfo.title(),
-                eventInfo.venueName(),
-                eventInfo.eventDate(),
-                eventInfo.description(),
-                eventInfo.imgUrl()
-        ));
+%         DBHelperLiked dbHelper = new DBHelperLiked(viewHolder.itemView.getContext());
+%         dbHelper.addLikedEvent(new LikedData(
+%                 eventInfo.eventId(),
+%                 userId,
+%                 eventInfo.title(),
+%                 eventInfo.venueName(),
+%                 eventInfo.eventDate(),
+%                 eventInfo.description(),
+%                 eventInfo.imgUrl()
+%         ));
 
-        Toast.makeText(viewHolder.itemView.getContext(),
-                "Liked event!", Toast.LENGTH_SHORT).show();
-    }
+%         Toast.makeText(viewHolder.itemView.getContext(),
+%                 "Liked event!", Toast.LENGTH_SHORT).show();
+%     }
 
-    private void playAnimation(ImageView animationView) {
-        Drawable drawable = animationView.getDrawable();
+%     private void playAnimation(ImageView animationView) {
+%         Drawable drawable = animationView.getDrawable();
 
-        animationView.setAlpha(1f);
+%         animationView.setAlpha(1f);
 
-        if (drawable instanceof AnimatedVectorDrawableCompat animatedDrawableCompat) {
-            animatedDrawableCompat.start();
-        } else if (drawable instanceof AnimatedVectorDrawable animatedDrawable) {
-            animatedDrawable.start();
-        }
-    }
+%         if (drawable instanceof AnimatedVectorDrawableCompat animatedDrawableCompat) {
+%             animatedDrawableCompat.start();
+%         } else if (drawable instanceof AnimatedVectorDrawable animatedDrawable) {
+%             animatedDrawable.start();
+%         }
+%     }
 
-    @Override
-    public int getItemCount() {
-        return eventList.size();
-    }
+%     @Override
+%     public int getItemCount() {
+%         return eventList.size();
+%     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
+%     public static class ViewHolder extends RecyclerView.ViewHolder {
 
-        final TextView textTitle;
-        final TextView textLocation;
-        final TextView textDate;
-        final TextView textDescription;
-        final ImageView imageView;
-        final LinearLayout tagCard;
+%         final TextView textTitle;
+%         final TextView textLocation;
+%         final TextView textDate;
+%         final TextView textDescription;
+%         final ImageView imageView;
+%         final LinearLayout tagCard;
 
-        public ViewHolder(@NonNull View itemView) {
-            super(itemView);
-            textTitle = itemView.findViewById(R.id.event_name);
-            textLocation = itemView.findViewById(R.id.event_location);
-            textDate = itemView.findViewById(R.id.event_date);
-            imageView = itemView.findViewById(R.id.event_image);
-            textDescription = itemView.findViewById(R.id.event_description);
-            tagCard = itemView.findViewById(R.id.cardId);
-        }
-    }
+%         public ViewHolder(@NonNull View itemView) {
+%             super(itemView);
+%             textTitle = itemView.findViewById(R.id.event_name);
+%             textLocation = itemView.findViewById(R.id.event_location);
+%             textDate = itemView.findViewById(R.id.event_date);
+%             imageView = itemView.findViewById(R.id.event_image);
+%             textDescription = itemView.findViewById(R.id.event_description);
+%             tagCard = itemView.findViewById(R.id.cardId);
+%         }
+%     }
 
 
-    @SuppressLint("NotifyDataSetChanged")
-    public void setEventList(List<Event> events) {
-        this.eventList = events;
-        notifyDataSetChanged();
-    }
+%     @SuppressLint("NotifyDataSetChanged")
+%     public void setEventList(List<Event> events) {
+%         this.eventList = events;
+%         notifyDataSetChanged();
+%     }
 
-    public record EventInfo(
-        String title, 
-        String venueName, 
-        String eventDate, 
-        String description, 
-        String imgUrl, 
-        String eventId) {}
-}
-\end{lstlisting}
+%     public record EventInfo(
+%         String title, 
+%         String venueName, 
+%         String eventDate, 
+%         String description, 
+%         String imgUrl, 
+%         String eventId) {}
+% }
+% \end{lstlisting}
+\inputminted[linenos, frame=lines]{java}{../new/EventAdapter.java}
 
-\section{Analisi del codice ristrutturato}
+\subsection{Analisi del codice ristrutturato}
 La funzione \verb|onBindViewHolder| è stata scomposta in più funzioni:
 \begin{itemize}
     \item \verb|mapEventToEventInfo| \\
@@ -549,4 +550,3 @@ Una volta eseguita la ristrutturazione, è stato possibile spostare le variabili
     \item Le variabili di classe \verb|avd3| e \verb|avd4| sono state rimosse perchè inutili nella nuova struttura del codice.
 \end{itemize}
 Sono stati rimossi i commenti superflui e quelli inutili, dato che la scomposizione del codice in numerose funzioni e la rinominazione delle variabili rendono tutto autoesplicativo.
-\end{document}
