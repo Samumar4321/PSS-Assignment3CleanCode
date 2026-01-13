@@ -3,8 +3,6 @@ package it.marcosoft.ticketwave.NetworkActivity;
 import android.content.Context;
 import android.util.Log;
 
-import androidx.recyclerview.widget.RecyclerView;
-
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -16,29 +14,36 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.json.JSONException;
+
 import it.marcosoft.ticketwave.EventModel.Event;
 
 /**
  * Utility class for parsing JSON responses from the Ticketmaster API.
  */
-public class JsonParser {
+public class TicketmasterClient {
+    private static final String TAG = "TicketmasterClient";
+
+    private static final String ENDPOINT_EVENTS = "discovery/v2/events";
+
     private static final String API_KEY = "apikey=KqtxCDlnofSteZ63m7gmezFR8PR34o78";
     
-    private static final String API_URL = "https://app.ticketmaster.com/"
+    private static final String API_URL = "https://app.ticketmaster.com/";
+
+    private static final String KEY_EMBEDDED = "_embedded";
+
+    private static final String KEY_EVENTS = "events";
 
     private final String endpoint;
 
     private final List<String> queryParams;
+    
+    private final TicketMasterListener listener;
 
-    private final List<Event> events;
-
-    private final OnEventsParsedListener onEventsParsedListener;
-
-    public JsonParser(String endpoint, List<String> queryParams, OnEventsParsedListener listener) {
+    public TicketmasterClient(String endpoint, List<String> queryParams, TicketMasterListener listener) {
         this.endpoint = endpoint;
         this.queryParams = queryParams;
-        this.events = new ArrayList<>();
-        this.onEventsParsedListener = listener;
+        this.listener = listener;
     }
 
     private String buildURL(){
@@ -48,36 +53,23 @@ public class JsonParser {
         }
         return urlBuilder.append(API_KEY).toString();
     }
-    
-    private void handleResponse(JSONObject response) {
-        try {
-            if (ENDPOINT_EVENTS.equals(endpoint)) {
-                List<Event> parsedEvents = parseEventsFromJson(response);
-                notifyListener(parsedEvents);
-            } else {
-                Log.w(TAG, "Unsupported endpoint: " + endpoint);
-            }
-        } catch (JSONException e) {
-            Log.e(TAG, "JSON Parsing error", e);
-        }
-    }
 
-    private List<Event> parseEventsFromJson(JSONObject response) throws JSONException {
-        List<Event> eventsList = new ArrayList<>();
+    private List<Event> fetchEventsFromJSON(JSONObject response) throws JSONException {
+        List<Event> events = new ArrayList<>();
         
         if (!response.has(KEY_EMBEDDED)) {
-            return eventsList; 
+            return events; 
         }
 
         JSONObject embedded = response.getJSONObject(KEY_EMBEDDED);
         JSONArray eventsArray = embedded.getJSONArray(KEY_EVENTS);
 
         for (int i = 0; i < eventsArray.length(); i++) {
-            JSONObject eventObj = eventsArray.getJSONObject(i);
-            eventsList.add(new Event(eventObj));
+            JSONObject eventJson = eventsArray.getJSONObject(i);
+            events.add(new Event(eventJson));
         }
-        
-        return eventsList;
+
+        return events;
     }
 
     private void notifyListener(List<Event> events) {
@@ -86,8 +78,25 @@ public class JsonParser {
         }
     }
 
+    private void handleResponse(JSONObject response) {
+        try {
+            if (ENDPOINT_EVENTS.equals(endpoint)) {
+                List<Event> parsedEvents = fetchEventsFromJSON(response);
+                notifyListener(parsedEvents);
+            } else {
+                String err = "Unsupported endpoint: " + endpoint;
+                Log.w(TAG, err);
+                if (listener != null) listener.onError(err);
+            }
+        } catch (JSONException e) {
+            String err = "JSON Parsing error";
+            Log.e(TAG, err, e);
+            if (listener != null) listener.onError(err);
+        }
+    }     
+
     public JsonObjectRequest createEventsRequest() {
-        String url = buildUrl();
+        String url = buildURL();
         Log.d(TAG, "Request URL: " + url);
 
         return new JsonObjectRequest(
@@ -95,11 +104,16 @@ public class JsonParser {
             url,
             null,
             response -> handleResponse(response),
-            error -> Log.e(TAG, "Volley error: " + error.getMessage())
+            error -> { 
+                String err = "Volley error: " + error.getMessage();
+                Log.e(TAG,err);
+                if (listener != null) listener.onError(err);
+            }
         );
     }
     
-    public interface OnEventsParsedListener {
+   public interface TicketMasterListener {
         void onEventsParsed(List<Event> events);
+        void onError(String message);
     }
 }
