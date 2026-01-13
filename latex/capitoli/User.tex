@@ -1,0 +1,49 @@
+\section{Classe User.java}
+    \subsection{Ruolo}
+
+    \subsection{Codice originale}
+    \inputminted[linenos, frame=lines]{java}{../old/User.java}
+
+    \subsection{Analisi di Clean Code}
+        \subsubsection{Nomi}      
+        I nomi risultano significativi sia dal punto di vista di attributi e variabili sia dal lato delle funzioni.
+        L'unico attributo mal nominato risulta essere \texttt{idToken} in quanto rappresenta una ambiguità e non è chiaro se si voglia rappresentare lo UserID o il TokenID del database di Firebase;
+        nel primo caso andrebbe rinominato l'attributo, nel secondo andrebbe rimosso in quanto non pertinente con la classe User.
+        
+        La classe \texttt{User} rispecchia il concetto di utente, seppur con qualche ambiguità dovuta ancora una volta ad all'accoppiamento di diverse responsabilità,
+        la classe dovrebbe rappresentare solo l'utente e le sue proprietà senza preoccuparsi di come scambiare i dati tra finestre di Android.
+
+        Altro problema di naming si trova invece nel metodo \texttt{describeContents()}, che risulta un nome esplicativo ma confusionario nell'ambito di utilizzo,
+        in questo caso però risulta corretto in quanto parte della implementazione standard dell'interfaccia \texttt{Parcelable}.
+
+        \subsubsection{Responsabilità}
+        Come detto la classe viola il \texttt{SRP (Single Responsibility Principle)} in quanto dovrebbe limitarsi a rappresentare un utente e le sue proprietà,
+        invece si occupa anche di gestire lo scambio di questi dati tra le differenti attività di Android.
+
+        Andrebbe divisa in due classi distinte, tra cui:
+        \begin{itemize}
+            \item una classe \textit{User} che rappresenti l'utente e le sue proprietà (nome, email, data di nascita, ecc);
+            \item una classe \textit{UserSession} che si occupi dello scambio di informazioni tra le varie finestre e attività di android.
+        \end{itemize}
+      
+        \subsubsection{Hardocoding}
+        La classe presenta un singolo problema di hardcoding, ovvero l'uso della stringa \texttt{"unknown"} per rappresentare un valore di attributo non definito.
+        Una soluzione migliore sarebbe utilizzare invece il valore \texttt{null}, che rappresenta meglio l'assenza di un valore, se lo si preferisce si potrebbe anche utilizzare una costante statica.
+
+        \subsubsection{Errori logici}
+        La variabile \texttt{age} è adatta ed esplicativa di cosa contiene, ma generalmente è preferibile utilizzare l data di nascita in rispetto all'età, 
+        per evitare il costante aggiornamento.
+
+        Gli errori più gravi si trovano invece nella definizione di setter e getter, in particolare:
+        \begin{itemize}
+            \item il setter \texttt{setSurname()} non accetta un parametro di input, rendendolo inutile in quanto non è possibile modificare il \texttt{surname} con questo metodo;
+            \item il getter \texttt{setAge()} ha lo stesso problema del metodo precedente, non accettando parametri in ingresso non risulta possibile modificare l'età dell'utente.
+        \end{itemize}
+               
+    \subsection{Code Refactoring}
+        \inputminted[linenos, frame=lines]{java}{../new/User.java}
+
+    \subsection{Modifiche effettuate}
+        
+            
+       
