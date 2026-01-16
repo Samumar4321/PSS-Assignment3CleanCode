@@ -1,15 +1,16 @@
-package it.marcosoft.ticketwave.model;
+packbirthDate it.marcosoft.ticketwave.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import java.util.Date;
 
 import com.google.firebase.database.Exclude;
 
 
 public class User implements Parcelable {
-    private String name;
-    private String surname;
-    private int age;
+    private String firstName;
+    private String lastName;
+    private Date birthDate;
     private String email;
 
     private String idToken;
@@ -18,44 +19,45 @@ public class User implements Parcelable {
 
     }
 
-    public User(String name, String email, String idToken) {
-        this.name = name;
+    public User(String firstName, String email, String idToken) {
+        this.firstName = firstName;
         this.email = email;
         this.idToken = idToken;
-        this.surname="unknown";
-        this.age=0;
+        this.lastName=null;
+        this.birthDate=null;
 
     }
 
-    public User(String name, String email, String surname, int age, String idToken) {
-        this.name = name;
-        this.surname=surname;
-        this.age=age;
+    public User(String firstName, String email, String lastName, Date birthDate, String idToken) {
+        this.firstName = firstName;
+        this.lastName=lastName;
+        this.birthDate=birthDate;
         this.email = email;
         this.idToken = idToken;
     }
 
-    public String getName() {
-        return name;
+    public String getfirstName() {
+        return firstName;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-    public String getSurname() {
-        return surname;
+    public void setfirstName(String firstName) {
+        this.firstName = firstName;
     }
 
-    public void setSurname() {
-        this.surname = surname;
+    public String getlastName() {
+        return lastName;
     }
 
-    public int getAge() {
-        return age;
+    public void setlastName(String lastName) {
+        this.lastName = lastName;
     }
 
-    public void setAge() {
-        this.age = age;
+    public Date getbirthDate() {
+        return birthDate;
+    }
+
+    public void setbirthDate(Date birthDate) {
+        this.birthDate = birthDate;
     }
 
 
@@ -80,11 +82,11 @@ public class User implements Parcelable {
     @Override
     public String toString() {
         return "User{" +
-                "name='" + name + '\'' +
-                ", surname='" + surname + '\'' +
+                "firstName='" + firstName + '\'' +
+                ", lastName='" + (lastName != null ? lastName : "N/A") + '\'' +
                 ", email='" + email + '\'' +
                 ", idToken='" + idToken + '\'' +
-                ", age='" + age + '\'' +
+                ", birthDate=" + (birthDate != null ? birthDate.toString() : "N/A") +
                 '}';
     }
 
@@ -95,13 +97,13 @@ public class User implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(this.name);
+        dest.writeString(this.firstName);
         dest.writeString(this.email);
         dest.writeString(this.idToken);
     }
 
     public void readFromParcel(Parcel source) {
-        this.name = source.readString();
+        this.firstName = source.readString();
         this.email = source.readString();
         this.idToken = source.readString();
 
@@ -109,7 +111,7 @@ public class User implements Parcelable {
     }
 
     protected User(Parcel in) {
-        this.name = in.readString();
+        this.firstName = in.readString();
         this.email = in.readString();
         this.idToken = in.readString();
     }
