@@ -60,7 +60,18 @@
         \inputminted[linenos, frame=lines]{java}{../new/User.java}
 
     \subsection{Modifiche effettuate}
-        Le modi
-        
-            
+    Partendo dai nomi, nel code refactoring sono state applicate le seguenti modifiche:
+    \begin{itemize}
+        \item l'attributo \texttt{name} è stato rinominato in \texttt{firstName} per maggiore chiarezza e standardizzazione;
+        \item l'attributo \texttt{surname} è stato rinominato in \texttt{lastName} per maggiore chiarezza e standardizzazione;
+        \item l'attributo \texttt{age} è stato rinominato in \texttt{birthDate} e il suo tipo cambiato da \texttt{int} a \texttt{Date}, per rappersentare la data di nascita invece che l'età,
+        questo diminuisce la quantità di aggiornamenti necessari e permette di impostare un valore nullo in caso di data mancante;         
+    \end{itemize}
+
+    La responsabilità della classe è rimasta invariata, rappresenta ancora un utente e le sue proprietà seppur contenendo anche la gestione delle activity legate ad Android.
+
+    Gli errori in setter e getter sono stati corretti, la classe offre ora la possibilità di modificare gli attributi \texttt{lastName} e \texttt{birthDate} tramite i rispettivi metodi \texttt{set}.
+
+    Il metodo \texttt{toString()} è stato modificato aggiungendo controlli per la data di nascita e per il cognome, in modo da non stampare \texttt{null} ma delle stringhe adatte, 
+    andando così a gestire il caso in cui questi siano mancanti o sconosciuti.
        
