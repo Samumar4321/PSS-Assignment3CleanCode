@@ -9,6 +9,8 @@
         I nomi risultano significativi sia dal punto di vista di attributi e variabili sia dal lato delle funzioni.
         L'unico attributo mal nominato risulta essere \texttt{idToken} in quanto rappresenta una ambiguità e non è chiaro se si voglia rappresentare lo UserID o il TokenID del database di Firebase;
         nel primo caso andrebbe rinominato l'attributo, nel secondo andrebbe rimosso in quanto non pertinente con la classe User.
+        Un errore più lieve si trova nel nome degli attributi \texttt{name} e \texttt{surname}, è comune utilizzare termini come \texttt{firstName} e \texttt{lastName} 
+        per evitare ambiguità in contesti di nomi con multipli termini.
         
         La classe \texttt{User} rispecchia il concetto di utente, seppur con qualche ambiguità dovuta ancora una volta ad all'accoppiamento di diverse responsabilità,
         la classe dovrebbe rappresentare solo l'utente e le sue proprietà senza preoccuparsi di come scambiare i dati tra finestre di Android.
@@ -26,13 +28,27 @@
             \item una classe \textit{UserSession} che si occupi dello scambio di informazioni tra le varie finestre e attività di android.
         \end{itemize}
       
-        \subsubsection{Hardocoding}
-        La classe presenta un singolo problema di hardcoding, ovvero l'uso della stringa \texttt{"unknown"} per rappresentare un valore di attributo non definito.
+        \subsubsection{Formattazione}
+        La formattazione risulta corretta, vengono rispettati i limiti consigliati di lunghezza orizzonatale e grandezza delle funzioni; la classe non presenta annidamenti eccessivi, dovuti alla
+        mancanza di funzioni molto complesse.
+
+        Il livello di astrazione viene rispettato e l'ordine delle funzioni segue una logica precisa, con setter e getter dello stesso attributo raggruppati insieme; le funzioni più complesse sono spostate
+        verso il fondo della classe.
+
+        \subsubsection{Hardcoding}
+        La classe presenta un singolo problema di hardcoding, ovvero l'uso della stringa \texttt{"unknown"} per rappresentare un valore di \texttt{surname} non definito.
         Una soluzione migliore sarebbe utilizzare invece il valore \texttt{null}, che rappresenta meglio l'assenza di un valore, se lo si preferisce si potrebbe anche utilizzare una costante statica.
 
+        L'attributo \texttt{age} presenta un problema simile, con il valore iniziale settato a \texttt{0} a rappresentare un'età sconosciuta, questo però comporta ambiguità e problemi di logica.
+        Sarebbe consigliato usare un altro valore, come \texttt{-1}, oppure cambiare tipo ad un \texttt{Integer} così da poter assegnare il valore \texttt{null}.
+
+        \subsubsection{Commenti}
+        Non sono presenti commenti nel codice della classe, in questo caso si tratta di un fattore positivo in quanto tutto il codice e i nomi delle variabili risultano autoesplicativi.
+        Le funzioni sono inoltre brevi, semplice e chiare, non necessitano quindi di commenti aggiuntivi.
+        
         \subsubsection{Errori logici}
-        La variabile \texttt{age} è adatta ed esplicativa di cosa contiene, ma generalmente è preferibile utilizzare l data di nascita in rispetto all'età, 
-        per evitare il costante aggiornamento.
+        La variabile \texttt{age} è adatta ed esplicativa di cosa contiene, ma generalmente è preferibile utilizzare la data di nascita in rispetto all'età, 
+        per evitare il costante aggiornamento nella base dei dati.
 
         Gli errori più gravi si trovano invece nella definizione di setter e getter, in particolare:
         \begin{itemize}
@@ -44,6 +60,7 @@
         \inputminted[linenos, frame=lines]{java}{../new/User.java}
 
     \subsection{Modifiche effettuate}
+        Le modi
         
             
        
