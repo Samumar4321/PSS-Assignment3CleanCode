@@ -69,7 +69,6 @@ public class User implements Parcelable {
         this.email = email;
     }
 
-
     @Exclude
     public String getIdToken() {
         return idToken;
