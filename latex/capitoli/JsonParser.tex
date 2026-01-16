@@ -52,6 +52,13 @@
 
         SOno presenti anche commenti per codice ormai rimosso, come mostrato alla riga 40.
 
+        \subsubsection{Formattazione}
+        La formattazione del codice risulta mediamente buona, con la maggior parte delle righe che rientrano nei limiti consigliati, seppur con qualche eccezione legata principalmente a 
+        definizioni di costanti o stringhe hardcoded troppo lunghe.
+
+        Anche l'ordine delle funzioni risulta accettabile e logico; il problema si ha nella quantità di livelli di indentazione all'interno della funzione principale \texttt{jsonParse()},
+        facilmente risolvibile suddividendo questa in più funzioni di grandezza minore.
+        
         \subsubsection{Hardocoding}
         La classe possiede un paio di problemi di embedding, in particolare la \textit{chiave API} è hardcoded in chiaro come attributo statico della classe, 
         ciò rappresenta un problema di sicurezza e manutenzione in caso di futuri cambiamenti.
@@ -67,38 +74,38 @@
         \inputminted[linenos, frame=lines]{java}{../new/JsonParser.java}
 
     \subsection{Modifiche effettuate}
-        Le modifiche apportate al codice originale sono diverse e mirate a risolvere i problemi citati nell'analisi di Clean Code.
+    Le modifiche apportate al codice originale sono diverse e mirate a risolvere i problemi citati nell'analisi di Clean Code.
 
-        La classe è stata rinominata in \textit{TicketmasterClient}, per riflettere che interagisce con la API esterna di TickeMaster.
-        Più ideale sarebbe la divisone della classe in due distinte, che si occupano di fare comunicazione con la API e pasring JSON in maniera separata, ma 
-        per semplicità di rappresentazione è stata mantenuta una singola classe.
+    La classe è stata rinominata in \textit{TicketmasterClient}, per riflettere che interagisce con la API esterna di TickeMaster.
+    Più ideale sarebbe la divisone della classe in due distinte, che si occupano di fare comunicazione con la API e pasring JSON in maniera separata, ma 
+    per semplicità di rappresentazione è stata mantenuta una singola classe.
 
-        Dal punto di vista dei nomi:
-        \begin{itemize}
-            \item l'attributo \textit{root} è stato rinominato in \textit{endpoint}, per rappresentare meglio il suo significato;
-            \item l'attributo \textit{eventsList} è stato rimosso, optando invece per una variabile locale \textit{events} all'interno della funzione di parsing;
-            \item la variabile \textit{eventObj} è stata rinominata in \textit{eventJson}, per specificare che si tratta di eventi JSON parsati;
-        \end{itemize}
+    Dal punto di vista dei nomi:
+    \begin{itemize}
+        \item l'attributo \textit{root} è stato rinominato in \textit{endpoint}, per rappresentare meglio il suo significato;
+        \item l'attributo \textit{eventsList} è stato rimosso, optando invece per una variabile locale \textit{events} all'interno della funzione di parsing;
+        \item la variabile \textit{eventObj} è stata rinominata in \textit{eventJson}, per specificare che si tratta di eventi JSON parsati;
+    \end{itemize}
 
-        La funzione \textit{jsonParse()} è stata divisa in più funzioni con responsabilità distinte:
-        \begin{itemize}
-            \item \textit{buildURL()} si occupa di creare l'URL della API da chiamare e ritornarlo;
-            \item \textit{fetchEventsFromJSON()} si occupa di eseguire il parsing del JSON e restituire la lista di eventi;
-            \item \textit{notifyListener()} si occupa di comunicare con l'oggetto Listener dopo che gli eventi sono stati ottenuti;
-            \item \textit{handleResponse()} si occupa di gestire la risposta della API, controllando eventuali errori e eseguendo la funzione di parsing;
-            \item \textit{createEventsRequest()} si occupa di creare la richiesta HTTP per ottenere gli eventi, utilizzando le funzioni precedenti per analizzare il JSON, notificare il listener e gestire la connessione.
-        \end{itemize}
+    La funzione \textit{jsonParse()} è stata divisa in più funzioni con responsabilità distinte:
+    \begin{itemize}
+        \item \textit{buildURL()} si occupa di creare l'URL della API da chiamare e ritornarlo;
+        \item \textit{fetchEventsFromJSON()} si occupa di eseguire il parsing del JSON e restituire la lista di eventi;
+        \item \textit{notifyListener()} si occupa di comunicare con l'oggetto Listener dopo che gli eventi sono stati ottenuti;
+        \item \textit{handleResponse()} si occupa di gestire la risposta della API, controllando eventuali errori e eseguendo la funzione di parsing;
+        \item \textit{createEventsRequest()} si occupa di creare la richiesta HTTP per ottenere gli eventi, utilizzando le funzioni precedenti per analizzare il JSON, notificare il listener e gestire la connessione.
+    \end{itemize}
 
-        Per risolvere i problemi di hardcoding invece ho apportato le seguenti modifiche:
-        \begin{itemize}
-            \item l'URL base della API è stata spostata in una costante statica \textit{API\_URL}, migliorando la manutenzione in caso di cambiamenti futuri;
-            \item la chiave per il parsing del JSON è stata rimossa dal codice e spostata in una costante statica \textit{KEY\_EMBEDDED}, permettendo una facile modifica in caso di cambiamenti alla struttura del JSON;
-            \item la chiave per ottenere gli eventi dal JSON è stata spostata in una costante statica \textit{KEY\_EVENTS};;  
-            \item il tag per il Log è stato spostato in una costante statica \textit{TAG}, così da poter essere modificato facilmente;    
-            \item il path per ottenere gli eventi è stato spostato in una costante statica \textit{ENDPOINT\_EVENTS}, permettendo di adattarsi ai cambiamenti futuri;  
-        \end{itemize}
+    Per risolvere i problemi di hardcoding invece ho apportato le seguenti modifiche:
+    \begin{itemize}
+        \item l'URL base della API è stata spostata in una costante statica \textit{API\_URL}, migliorando la manutenzione in caso di cambiamenti futuri;
+        \item la chiave per il parsing del JSON è stata rimossa dal codice e spostata in una costante statica \textit{KEY\_EMBEDDED}, permettendo una facile modifica in caso di cambiamenti alla struttura del JSON;
+        \item la chiave per ottenere gli eventi dal JSON è stata spostata in una costante statica \textit{KEY\_EVENTS};;  
+        \item il tag per il Log è stato spostato in una costante statica \textit{TAG}, così da poter essere modificato facilmente;    
+        \item il path per ottenere gli eventi è stato spostato in una costante statica \textit{ENDPOINT\_EVENTS}, permettendo di adattarsi ai cambiamenti futuri;  
+    \end{itemize}
 
-        I commenti sono stati rimossi in quanto superflui, si ritiene che i nomi di variabili e funzioni siano autoesplicativi e non necessitino di commenti che
-        ne approfondiscano il significato, come indicato anche dai principi di Clean Code.
+    I commenti sono stati rimossi in quanto superflui, si ritiene che i nomi di variabili e funzioni siano autoesplicativi e non necessitino di commenti che
+    ne approfondiscano il significato, come indicato anche dai principi di Clean Code.
             
        
