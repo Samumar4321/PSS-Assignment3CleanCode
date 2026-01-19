@@ -1,5 +1,8 @@
 \section{Classe User.java}
     \subsection{Ruolo}
+    La classe svolge il ruolo di modello di dominio, andando a rappresentare un utente dell'applicazione, contenendo le sue proprietà principali quali: nome,  cognome, mail e età.
+
+    Oltre a rappresentare l'utente, la classe utilizza l'interfaccia \texttt{Parcelable} di Android per permettere lo scambio di oggetti User in maniera efficiente tra le varie attività dell'applicazione.
 
     \subsection{Codice originale}
     \inputminted[linenos, frame=lines]{java}{../old/User.java}

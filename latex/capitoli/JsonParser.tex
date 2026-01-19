@@ -1,5 +1,13 @@
 \section{Classe JsonParser.java}
     \subsection{Ruolo}
+    Nonostante il nome, la classe non si occupa esclusivamente di fare il parsing di file JSON, ma anche di gestire la comunicazione con la API esterna di TicketMaster, su cui la applicazione 
+    si basa per ottenere gli eventi futuri da mostrare agli utenti.
+    
+    Questo la trasforma in una classe di tipo Client, che comunica con un servizio esterno, la API di TicketMaster in questo caso, per ottenere i dati necessari al corretto funzionamento dell'applicazione.
+
+    La funzione principale infatti si occupa di creare un URL dinamico, utilizzando l'endpoint base e aggiungendo la chiave API e eventuali parametri di query.
+    Successivamente stabilisce e gestisce una connessione HTTP verso questo URL, ottenendo la risposta in JSON da parte di TicketMaster.
+    Infine esegue il parsing della risposta ottenuta, estraendo gli eventi e notificando il listener dei dati ottenuti.
 
     \subsection{Codice originale}
     \inputminted[linenos, frame=lines]{java}{../old/JsonParser.java}
