@@ -47,6 +47,16 @@ Per ottenere questi risultati l'applicazione si interfaccia con la API di Ticker
 
 L'applicazione originale è disponibile su GitHub al seguente link: \url{https://github.com/FrancescoRomeo02/TicketWave_AndroidApp}.
 
+    \subsection{Classi scelte}
+    Le classi scelte per l'analisi sono le seguenti:
+    \begin{itemize}
+        \item \texttt{User.java}: rappresenta l'utente dell'applicazione, gestendo le sue proprietà e occupandosi dello scambio di informazioni legate a questo;
+        \item \texttt{JsonParser.java}: si occupa della comunicazione con la API di TicketMaster, ottenendo i dati in formato JSON e parsandoli per estrarre le informazioni rilevanti;
+        \item \texttt{EventAdapter.java}: gestisce la visualizzazione degli eventi all'interno della applicazione, crea viste dinamiche per mostrare gli eventi agli utenti;
+        \item \texttt{DBHelperLiked.java}: ha il compito di gestire gli eventi preferiti dell'utente all'interno del database SQLite locale;
+        \item \texttt{MainActivity.java}: rappresenta la classe principale, si occupa della procedura di login e navigazione tra le schermate dell'app.
+    \end{itemize}
+
 \newpage
 \subfile{capitoli/EventAdapter.tex}
 \subfile{capitoli/JsonParser.tex}
