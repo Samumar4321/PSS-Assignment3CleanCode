@@ -1,0 +1,57 @@
+\section{classe MainActivity.java}
+
+\subsection{codice originale}
+\begin{minted}{java}
+
+\end{minted}
+
+\subsection{Analisi di Clean Code}
+
+Questa classe si occupa di gestire la UI dell'app e del movimento tra le pagine al suo interno.
+
+\subsubsection{Nomi}
+I nomi delle variabili erano tutte accettabili, tuttavia i metodi nella classe MainActivity originale non riflettono correttamente l'intento dell'operazione o contengono ambiguità:
+\begin{itemize}
+    \item     \textit{gotologin()} non rappresenta l'azione reale svolta dall'utente, che non è solo quella di portare lo user alla pagina di log in, ma principalmente è quella di disconnettere il proprio account. Il nome \textit{logout()} è quindi molto più esplicativo sul ruolo del metodo;
+    \item \textit{gotouserpage()} è un nome accettabile ma, per coerenza con il framework di android studio, \textit{navigatetouserpage()} risulterebbe più corretto;
+    \item \textit{setupmainscreen()} è un nome fuorviante, quasi incorretto. Quello che questo metodo compie è il caricamento del fragment richiesto durante la navigazione dell'applicazione. Quindi non si occupa di caricare solo la schermata principale della app, ma di navigare all'interno della applicazione. Di conseguenza il nome del metodo è stato modificato in \textit{setupNavigation}(). Inoltre, secondo il principio di SRP di cui parleremo in dettaglio successivamente, questa classe, è stata divisa in più classi con nomi adeguati al ruolo che compiono, ovvero \textit{createFragmentById} e \textit{loadFragment};
+    \item     la chiamata \textit{sharedpreferencesutil.getloginstatus(this)} all'interno del metodo \textit{onCreate} come argomento dell' \texttt{if} è una scelta implementativa che appesantisce la lettura del codice, oltre che per ragioni implementative di ricorrenza dell'utilizzo in futuri espansioni del codice richiederebbe di essere definito in un metodo a se stante. Quindi l'operazione è stata estratta dal metodo ed implementata in una funzione chiamata \textit{isuserloggedin()} . Inoltre per principio di SRP i contenuti dell' if sono stati estrapolati inseriti in classi separate, non solo in quanto si occupavano di compiti specifici separati dall'obbiettivo del metodo \textit{onCreate}, ma anche perchè il contenuto dell'else era utilizzato più volte per eseguire la stessa operazione. quindi per evitare duplicazioni inutili di codice e migliorare la comprensibilità del codice, sono stati estrapolati in due nuovi metodi: \textit{ setupNavigation()} e  \textit{showWelcomeScreen()};
+    \item \textit{writefileforfragments()} ha un nome del tutto non adeguato. Dal nome sembrerebbe scrivere un file, mentre in realtà si occupa di definire lo stato dell'utente come "logged in". Di conseguenza il nome è stato modificato a login. 
+\end{itemize}
+
+\subsubsection{Responsabilità}
+la classe viola il principio di singola responsabilità in diversi punti. Il metodo che lo commette in maniera più evidente è\textit{ oncreate} che non solo gestisce il controllo dell'autenticazione e la creazione della pagina principale della app e l'inizializzazione del fragment visibile (ovvero la gestione generale di base della UI, l'involucro dei fragment), ma anche i dettagli sulla navigazione e alterazione dell'attuale fragment per accedere ad altre pagine. 
+Quindi la funzione si ritrovava a svolgere anche la parte di caricamento delle pagine stesso, che è stato delegato di conseguenza a due classi separate, in base allo stato attuale dello user (loggedIn, oppure se non lo era), ovvero:
+\begin{itemize}
+    \item setupNavigation(): Si occupa della navigazione vera e propria della app, e quindi di caricare il fragment richiesto durante la navigazione. La logica che utilizza il listener per rispondere agli input dello user si trova in questa sezione. Tuttavia, da questo metodo a sua volta sono state estrapolate altre due classi:
+    \begin{itemize}
+        \item  \textit{createFragmentById} che crea effettivamente il fragment richiesto in base all'id rilevato dal listener 
+        \item  \textit{loadFragment} che si occupa di effettivamente di caricarla il fragment specifico sulla UI
+    \end{itemize}
+
+    \item showWelcomeScreen(): direttamente carica il fragment della pagina iniziale di login, fuori dalla area     privata dello user. La scelta di estrapolare questa parte dal metodo iniziale è tuttavia leggermente diversa rispetto a setupNavigation(), ovvero per evitare codice inutilmente duplicato: infatti questa operazione avviene nel codice più volte, non solo nel metodo onCreate() ma anche durante l'operazione di logout(). 
+\end{itemize}
+
+\subsubsection{Commenti}
+I commenti risultavano per lo più utili nel codice iniziale, soprattutto quelli nella classe setupMainScreen. Tuttavia dopo aver refactorizzato il codice, non erano più necessari in quanto applicando i principi di SRP e cambiando la nomenclatura il codice era comprensibile, e i commenti non avrebbero aggiunto informazioni aggiuntive.
+
+\subsubsection{Hardcoding}
+Vengano utilizzate le risorse \textit{r.layout} in maniera manuale, non normalmente adatta ad una applicazione di grandezza significativa.,la logica di assegnazione manuale dei titoli ai tasti della barra di navigazione tramite codice java è una forma di hardcoding logico che dovrebbe essere evitata, delegando il compito ai file di configurazione xml del menu, tuttavia essendo l'applicazione limitata nella sua dimensione può risultare accetabile per evitare lunghe attese nella durata del caricamento dei fragment.
+
+\subsubsection{Gestione degli errori}
+Non veniva effettuato un controllo di validità sui frammenti prima del caricamento nel metodo \textit{loadfragment}. nel codice ristrutturato è stato aggiunto un controllo di nullità per evitare crash dell'applicazione. 
+Il controllo del login era corretto e funzionante.
+
+\subsection{code refactoring}
+\begin{minted}{java}
+
+\end{minted}
+
+\subsection{Analisi del codice ristrutturato}
+\begin{itemize}
+I metodi sono stati rinominati per riflettere l'intento logico anziché l'azione tecnica. Ad esempio, logout() e login() hanno sostituito nomi ambigui come gotologin() o writefileforfragments(), rendendo il codice immediatamente comprensibile.
+ La classe è stata inoltre scomposta per rendere il codice più leggibile e dividere i compiti in maniera ordinata. Il metodo onCreate non gestisce più tutto il flusso, ma delega la verifica della sessione a isUserLoggedIn(), la creazione dei fragment a createFragmentById() e la loro visualizzazione a loadFragment().
+Grazie a metodi come showWelcomeScreen(), la logica di accesso è ora scritta una sola volta e riutilizzata sia all'avvio che al logout, seguendo il principio Don't Repeat Yourself.
+ La nuova struttura ha rimosso i commenti necessari precedentemente per leggere il codice, ma che dopo le modifiche risultavano ridondanti e inutili.
+È stato introdotto un controllo di validità (null check) per evitare crash durante il caricamento dei fragment e rimossa la gestione manuale dei titoli via Java, delegandola correttamente ai file XML del menu.
+\end{itemize}

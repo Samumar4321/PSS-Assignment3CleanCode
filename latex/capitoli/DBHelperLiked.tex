@@ -1,0 +1,61 @@
+\section{Classe DBHelperLiked.java}
+
+\subsection{Codice originale}
+\inputminted[linenos, frame=lines]{java}{../old/DBHelperLiked.java}
+
+\subsection{Analisi di Clean Code}
+
+Questa classe si occupa di gestire l'interazione tra l'applicazione e il database degli eventi a cui ha messo il like l'utente.
+
+\subsubsection{Nomi}
+i nomi di variabili risultano per lo più corretti, con gli attributi della classe che rispecchiano ciò che rappresentano. Tuttavia alcune classi risultano contenere ripetizioni superflue nella nomenclatura:
+\begin{itemize}
+    \item \textit{database\_name\_liked} e \textit{database\_version\_liked} presentano un suffisso ridondante; essendo già all'interno della classe \texttt{dbhelperliked}, l'informazione è implicita. i nomi \textit{database\_name} e \textit{database\_version} risultano più puliti;
+    \item \textit{table\_liked\_events} risulta eccessivamente lungo e ridondante nel contesto della classe. la ridenominazione in \textit{table\_events} rende le query sql più leggibili e concise;
+    \item \textit{column\_event\_id} (e le altre costanti di colonna) utilizzano il prefisso \textit{column\_} che appesantisce la lettura. l'abbreviazione \textit{col\_} mantiene il significato riducendo il rumore visivo;
+    \item \textit{likedeventlist} riflette il contenuto ma specifica inutilmente il tipo di struttura dati (\textit{list}), violando il principio di evitare codifiche nei nomi. il nome \textit{events} risulta sufficiente e più astratto.
+\end{itemize}
+
+Per le funzioni, invece, i nomi risultano talvolta poco chiari e spesso non riflettono l'intento logico dell'operazione: \begin{itemize} 
+\item \textit{getLikedEventDataById()} non contiene la parola "data" nonostante non sia necessaria e non presente in altro metodi simili come \textit{addLikedEvent}. Quindi è stato modifica ed accorciato a \textit{getLikedEventById}; 
+\item La logica originale mancava di metodi con nomi espliciti per singole responsabilità. L'introduzione di \textit{mapCursorToLikedData()} e \textit{getCreateTableQuery()} permette di rivelare l'intento delle operazioni di mappatura e generazione query che prima erano nascoste nel codice originale. \end{itemize}
+
+
+\subsubsection{Responsabilità}
+La classe violava il \textit{Single Responsibility Principle}. Il metodo \texttt{getAllLikedEvents} si occupava contemporaneamente di: gestire la connessione al database, eseguire la query, iterare sul cursore e mappare i risultati nell'oggetto \texttt{LikedData}. Inoltre nel codice originale, la logica per creare l'oggetto \verb|LikedData| da caricare nel database era mescolata all'interno del metodo \verb|addLikedEvent| , che si occupa anche dell'upload al database dell'oggetto. Quindi sono state create due nuove classi, mapCursorToLikedData e createContentValues per occuparsi di questi compiti in maniera distaccata dalle interazione di lettura e scrittura con il database. 
+
+\subsubsection{Commenti}
+Erano presenti commenti superflui in quanto i nomi dell classi erano autoesplicativi (I commenti alcune volte erano anche in lingue diverse, rendendoli confusionari) non offrendo informazioni in più non intuibili dal nome. Questi commenti erano:
+\begin{itemize}
+    \item \texttt{// Metodo per ottenere tutti gli eventi liked dal database} 
+    \item     \texttt{// Method to get all liked events}
+    \item   \texttt{// Method to check if an event is already liked}
+    \item \texttt{// Method to remove a liked event}
+    \item \texttt{// Metodo per aggiungere un evento liked}
+\end{itemize}
+Il codice dovrebbe rivelare l'intento senza necessità di note esterne, e i commenti dovrebbero chiarire solo dettagli sul funzionamento della classe. Essendo il codice più che esplicito nella sua nomenclatura e nello scopo di ogni metodo, i commenti sono stati rimossi. Il codice è strutturato in maniera adeguata, risultando leggibile senza necessità di ulteriori commenti di specifica sul funzionamento dei metodi al suo interno.
+
+
+\subsubsection{Hardcoding}
+La classe presentava un problema di hardcoding, ovvero la classe \texttt{onCreate} dove la creazione della tabella era definita tramite una stringa concatenata dichiarata come costante. La struttura della query SQL risultava cablata nel flusso logico in questo modo in maniera statica e non modificabile in alcun modo, poco consone alle pratiche di scrittura delle query nel codice. Di conseguenza la query è stata trasformata in un metodo involcabile e non più costante, rendendola più flessibile nel suo utilizzo.
+
+\subsubsection{Gestione errori}
+Il codice originale utilizzava solo parzialmente il costrutto \textit{try-with-resources} o blocchi \texttt{try-finally}, mancando quindi della capacità di captare tutti gli errori. In caso di eccezione durante l'iterazione del cursore, il database o il cursore stesso potevano rimanere aperti, causando leak di memoria. L'uso di \texttt{@SuppressLint("Range")} serviva solo a nascondere un potenziale problema di gestione degli indici delle colonne, senza gestire l'errore alla base.
+
+\subsection{Code Refactoring}
+\inputminted[linenos, frame=lines]{java}{../new/DBHelperLiked.java}
+
+\subsection{Analisi del codice ristrutturato}
+È stata rimossa una classe senza implementazione chiamata \texttt{onUpgrade}. Sono state appliccate delle modifiche per rispettare il Single Responsibility Principle:
+
+\begin{itemize}
+    \item \verb|getAllLikedEvents|: La funzione getAllLikedEvents originariamente si occupava sia di ottenere tutti i dati riguardanti gli eventi liked, ma anche della Logica di Mapping. Per questo è stata scomposta e isolata la parte della Logica di Mapping nel metodo \verb|mapCursorToLikedData| in quanto è un operazione a se stante che serve per leggere e recuperare dati dal database. \verb|mapCursorToLikedData| è stato inoltre utilizzato per evitare ripetizione di codice nel metodo   \verb|getLikedEventById|
+    \item \verb|addLikedEvent|: La funzione si occupava sia di caricare tutti i dati riguardanti gli eventi liked sul database oltre che creare il costrutto da caricare sul database. Per questo l'operazione della creazione del costrutto è stata scomposta la parte della creazione del  nel metodo e trasferita in un metodo a se stante chiamato \verb|createContentValues|. 
+
+
+
+\end{itemize}
+
+Sono stati rimossi i commenti superflui e quelli inutili, dato che la scomposizione del codice in numerose
+funzioni e la rinominazione delle variabili rendono tutto autoesplicativo, e come detto precedentemente, sono stati modificati i nomi che contenevano ridondanze inutili. 
+Sono state aggiunte varie sezioni di cattura errori per evitare data leakage e accessi senza terminazione al database, che avrebbero potuto creare problemi di sicurezza e gestione della memoria per il programma, in particolare durante l'accesso al database per operazioni di scrittura o lettura.
